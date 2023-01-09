@@ -55,7 +55,9 @@ Main:Label("Toggle GUI with Right Ctrl")
 Main:Button("Destroy GUI",function()
     game:GetService("CoreGui").Library:Destroy()
 end)
-Main:Button("Join Discord",function()
+Main:Button("Copy Discord Link",function()
+    local copy = "https://discord.gg/rudE7ucZdx"
+    setclipboard(tostring(copy))
     inviteModule.Join("https://discord.gg/rudE7ucZdx")
 end)
 Main:Colorpicker("Notification Color",Color3.fromRGB(255, 0, 0),function(t)
@@ -66,6 +68,45 @@ Main:Button("Credits",function()
         {Title = "Credits", Description = "RatatuiHelp#0267 (me)"},
         {OutlineColor = getgenv().notifColor,Time = 5, Type = "default"}
     )
+end)
+
+Main:Colorpicker("Selection Color",Color3.fromRGB(255, 0, 0),function(t)
+    getgenv().slco = t
+end)
+
+Main:Toggle("Selection",function(t)
+    getgenv().sc = t
+    spawn(function()
+        while getgenv().sc == true and wait() do
+            game:GetService("Workspace").SelectionBox.Color3 = getgenv().slco
+        end
+    end)
+end)
+
+Main:Toggle("Hide Name List",function(t)
+    getgenv().tplantc = t
+    spawn(function()
+        while getgenv().tplantc == true and wait() do
+            local plr = game.Players.LocalPlayer
+            local plrr = game.Players.LocalPlayer.Name
+            game:GetService("Players").LocalPlayer.PlayerGui.SecondaryGui.PlayerList.List[plrr].Visible = false
+        end
+    end)
+end)
+
+Main:Toggle("Hide Lvl",function(t)
+    getgenv().goldspa = t
+    spawn(function()
+        if getgenv().goldspa then
+            wait()
+            pcall(
+                function()
+                    game:GetService("Players").RatatuiHelp.PlayerGui.MainGui.Panels.Topbar.EssenceBar.TextLabel.Visible = false
+                end)
+        elseif not getgenv().goldspa then
+            game:GetService("Players").RatatuiHelp.PlayerGui.MainGui.Panels.Topbar.EssenceBar.TextLabel.Visible = true
+        end
+    end)
 end)
 
 ---HEALS-------------------------------------------------------------------------------------------
@@ -479,9 +520,37 @@ Heals:Toggle("AutoHeal - Strawberry",function(Value)
     AutoStraw5()
 end)
 
+Heals:Label("Another Heal Method")
+
+Heals:Textbox("Fruit Name", true,function(t)
+    getgenv().nono = t
+    notif("+Added " .. t, 3)
+end)
+
+Heals:Textbox("Speed (4 recommend)", true,function(t)
+    getgenv().nospeed = t
+    notif("+Added ".."x".. t.."Speed", 3)
+end)
+
+Heals:Toggle("Auto Heal",function(t)
+    getgenv().myautoheal = t
+    spawn(function()
+        while getgenv().myautoheal == true and wait() do
+            function food()
+                for i=1, getgenv().nospeed do
+                game:GetService("ReplicatedStorage").Events.UseBagItem:FireServer(getgenv().nono) 
+                end
+                end
+                if game.Players.LocalPlayer.Character.Humanoid.Health < 100 then
+                food()
+                end
+        end
+    end)
+end)
+
 --COMBAT--------------------------------------------------------------------------------------------
 
-Farm:Toggle("Kill Aura",function(t)
+Comb:Toggle("Kill Aura",function(t)
     getgenv().tpclaant = t
     spawn(function()
         while getgenv().tpclaant == true and wait() do
@@ -632,8 +701,11 @@ Pl:Toggle("Auto Rebirh Lvl 100",function(t)
             game:GetService("ReplicatedStorage").Events.Rebirth:FireServer()
             end
         end
-    end)
+        end)
 end)
+
+Pl:Label("Noclip")
+
 
 Pl:Textbox("Keybind", true,function(t)
     getgenv().nck = t
@@ -659,6 +731,43 @@ Pl:Button("Noclip",function()
             loop2 = false
         end
 end)
+end)
+
+Pl:Label("Extra")
+
+Pl:Label("Spam")
+
+Pl:Textbox("Text", true,function(t)
+    getgenv().txt = t
+    notif("Item set to " .. t, 3)
+end)
+
+Pl:Textbox("Speed", true,function(t)
+    getgenv().txtspeed = t
+    notif("Item set to " .. t, 3)
+end)
+
+Pl:Textbox("Keybind", true,function(t)
+    getgenv().keybindtxt = t
+    notif("Item set to " .. t, 3)
+end)
+
+Pl:Toggle("Spam",function(t)
+    getgenv().spam = t
+    spawn(function()
+        game.Players.LocalPlayer:GetMouse().KeyDown:Connect(function(key)
+            if key == getgenv().keybindtxt then
+        while getgenv().spam == true and wait(getgenv().txtspeed) do
+            local args = {
+                [1] = getgenv().txt,
+                [2] = "All"
+            }
+            
+            game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(unpack(args))
+        end
+        end
+        end)
+    end)
 end)
 
 Farm:Label("AFK Eat")
@@ -696,7 +805,7 @@ end)
 Farm:Toggle("Auto Plant",function(t)
     getgenv().tplant = t
     spawn(function()
-        while getgenv().tplant == true and wait() do
+        while getgenv().tplant == true and wait(2) do
             for _, v in pairs(game:GetService("Workspace").Deployables:GetChildren()) do
                 if v.Name == "Plant Box" and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude < getgenv().magnitude then
                     game.ReplicatedStorage.Events.InteractStructure:FireServer(v, getgenv().tplantt)
@@ -720,7 +829,7 @@ end)
 Farm:Toggle("Harverest",function(t)
     getgenv().hplant = t
     spawn(function()
-        while getgenv().hplant == true and wait() do
+        while getgenv().hplant == true and wait(1) do
             for _, v in pairs(game:GetService("Workspace"):GetChildren()) do
                 if v.Name == getgenv().hplantt and (game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position - v.PrimaryPart.Position).magnitude < getgenv().magnitude1 then
                     game:GetService("ReplicatedStorage").Events.Pickup:FireServer(v)
@@ -731,61 +840,489 @@ Farm:Toggle("Harverest",function(t)
     end)
 end)
 
-Farm:Label("Aura")
+Farm:Label("TP Points")
 
-Farm:Toggle("Aura - All",function(t)
-    getgenv().aura1 = t
+Farm:Toggle("Rec TP",function(t)
+    getgenv().tp1c = t
     spawn(function()
-        while getgenv().aura1 == true and wait() do
-            wait()
-            pcall(
-                function()
-                    local p = game:GetService("Players")
-                    local n = p.LocalPlayer.Character.HumanoidRootPart
-                    local q = game:GetService("Workspace")
-                    local o = game:GetService("ReplicatedStorage")
-                    function getNear()
-                        local R
-                        local S = math.huge, nil
-                        for b, c in pairs(game.workspace:GetChildren()) do
-                            if c.Name:find(getgenv().getstructureaura) then
-                                if c:FindFirstChildWhichIsA("BasePart") then
-                                    if
-                                        not c:FindFirstChild("Humanoid") and
-                                            c:FindFirstChild("Health")
-                                     then
-                                        if
-                                            (n.Position -
-                                                c:FindFirstChildWhichIsA("BasePart").Position).Magnitude <
-                                                S
-                                         then
-                                            R = c:FindFirstChildWhichIsA("BasePart")
-                                            S =
-                                                (n.Position -
-                                                c:FindFirstChildWhichIsA("BasePart").Position).Magnitude
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                        return R
-                    end
-                    local U = getNear()
-                    local ac = {}
-                    for b, c in pairs(U.Parent:GetChildren()) do
-                        if c:IsA("BasePart") then
-                            table.insert(ac, c)
-                        end
-                    end
-                    game:GetService("ReplicatedStorage").Events.SwingTool:FireServer(
-                        o.RelativeTime.Value,
-                        ac
-                    )
-                end
-            )
-        end
+            _G.SetFarmPos = t
+	     
+            if _G.SetFarmPos then
+                print("wsp")
+                n = 1
+           _G.farmarray = {}
+            end
+           while _G.SetFarmPos and wait(.5) do
+               print(n)
+           _G.farmarray[n] =  game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame
+           n = n + 1 
+           end
     end)
 end)
+
+Farm:Toggle("Start TP Points",function(Value)
+            _G.autofarmfruit = Value
+            _G.farmarraylength = #(_G.farmarray)
+                print("Farm array length = ", farmarraylength)
+            while _G.autofarmfruit and wait() do
+    for i = 1, _G.farmarraylength do
+        if _G.autofarmfruit == false then
+            i = 0 
+            _G.farmarraylength = 0
+        end
+        
+        print(i)
+        print(_G.farmarraylength)
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = _G.farmarray[i]
+        wait(.8)
+    
+    end  
+    end
+end)
+
+Farm:Label("Another Method Of Positions")
+
+Farm:Button("Position - 1",function()
+    D = nil
+    wait()
+    D = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 2",function()
+    E = nil
+    wait()
+    E = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 3",function()
+    F = nil
+    wait()
+    F = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 4",function()
+    G = nil
+    wait()
+    G = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 5",function()
+    H = nil
+    wait()
+    H = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 6",function()
+    I = nil
+    wait()
+    I = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 7",function()
+    J = nil
+    wait()
+    J = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 8",function()
+    K = nil
+    wait()
+    K = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 9",function()
+    L = nil
+    wait()
+    L = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 10",function()
+    M = nil
+    wait()
+    M = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 11",function()
+    N = nil
+    wait()
+    N = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 12",function()
+    O = nil
+    wait()
+    O = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 13",function()
+    P = nil
+    wait()
+    P = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 14",function()
+    Q = nil
+    wait()
+    Q = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 15",function()
+    R = nil
+    wait()
+    R = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 16",function()
+    S = nil
+    wait()
+    S = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 17",function()
+    T = nil
+    wait()
+    T = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 18",function()
+    U = nil
+    wait()
+    U = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 19",function()
+    V = nil
+    wait()
+    V = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 20",function()
+    W = nil
+    wait()
+    W = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 21",function()
+    X = nil
+    wait()
+    X = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 22",function()
+    Y = nil
+    wait()
+    Y = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Button("Position - 23",function()
+    Z = nil
+    wait()
+    Z = CFrame.new(game.Players.LocalPlayer.Character.HumanoidRootPart.Position)
+end)
+
+Farm:Toggle("Start TP",function(m)
+    getgenv().autotpselectedposv3 = m
+    if m then
+        spawn(
+            function()
+                while autotpselectedposv3 do
+                    wait()
+                    pcall(
+                        function()
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = D
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = E
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = F
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = G
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = H
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = I
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = J
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = K
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = L
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = M
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = O
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = P
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = Q
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = R
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = S
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = T
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = U
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = V
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = W
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = X
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = Y
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                            wait(w)
+                            local n = game.Players.LocalPlayer.Character.HumanoidRootPart
+                            local u = Z
+                            local v = 10
+                            local w =
+                                math.round(math.abs((n.Position - u.Position).Magnitude)) / tonumber(v)
+                            local x =
+                                game:GetService("TweenService"):Create(
+                                n,
+                                TweenInfo.new(tonumber(w), Enum.EasingStyle.Linear),
+                                {CFrame = u}
+                            )
+                            x:Play()
+                        end
+                    )
+                end
+            end
+        )
+end
+end)
+
+Farm:Label("Aura")
 
 Farm:Toggle("Aura - Feather Bush",function(t)
     getgenv().aura2 = t
@@ -2658,6 +3195,52 @@ Inv:Button("Armor Invisible",function()
         end
         end
         end	
+end)
+
+Inv:Button("Chestplate Invisible",function()
+    local v = game.Players.LocalPlayer
+
+    for i, c in pairs(v.Character:GetDescendants()) do
+    if c.Name:find("Chestplate") then
+    c.Handle.AccessoryWeld:Destroy()
+    end
+    end
+    for i, c in pairs(v.Character:GetDescendants()) do
+    if c.Name:find("Left Shoulder") then
+    c.Handle.AccessoryWeld:Destroy()
+    end
+    end
+    for i, c in pairs(v.Character:GetDescendants()) do
+    if c.Name:find("Right Shoulder") then
+    c.Handle.AccessoryWeld:Destroy()
+    end
+    end
+end)
+
+Inv:Button("Legs Invisible",function()
+    local v = game.Players.LocalPlayer
+
+    for i, c in pairs(v.Character:GetDescendants()) do
+    if c.Name:find("Legs") then
+    c.Handle.AccessoryWeld:Destroy()
+    end
+    end
+    local v = game.Players.LocalPlayer
+
+    for i, c in pairs(v.Character:GetDescendants()) do
+    if c.Name:find("Legs Foot") then
+    c.Handle.AccessoryWeld:Destroy()
+    end
+    end
+end)
+
+Inv:Button("God Halo Invisible",function()
+    local v = game.Players.LocalPlayer
+    for i, c in pairs(v.Character["God Halo"]:GetDescendants()) do
+    if c.Name == "AccessoryWeld" then
+    c:Destroy()
+    end
+    end
 end)
 
 
